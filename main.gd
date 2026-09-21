@@ -14,6 +14,7 @@ var quest := 0
 var message := "Find Elder Rowan near the old well."
 var message_time := 5.0
 var game_won := false
+var attack_cooldown := 0.0
 
 func _ready():
 	queue_redraw()
@@ -22,14 +23,19 @@ func _process(delta):
 	if game_won:
 		queue_redraw()
 		return
-	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var dir := Vector2.ZERO
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT): dir.x -= 1
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT): dir.x += 1
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP): dir.y -= 1
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN): dir.y += 1
 	player += dir.normalized() * SPEED * delta if dir.length() > 0 else Vector2.ZERO
 	player.x = clamp(player.x, WORLD.position.x + 18, WORLD.end.x - 18)
 	player.y = clamp(player.y, WORLD.position.y + 18, WORLD.end.y - 18)
 	message_time = max(0.0, message_time - delta)
-	if Input.is_action_just_pressed("interact"):
+	attack_cooldown = max(0.0, attack_cooldown - delta)
+	if Input.is_key_pressed(KEY_E) and message_time <= 0.0:
 		interact()
-	if Input.is_action_just_pressed("attack"):
+	if Input.is_key_pressed(KEY_SPACE) and attack_cooldown <= 0.0:
 		attack()
 	if slime_alive and player.distance_to(slime) < 100 and randf() < delta * 0.25:
 		hp -= 1
@@ -60,6 +66,7 @@ func interact():
 		message_time = 3
 
 func attack():
+	attack_cooldown = 0.3
 	if slime_alive and player.distance_to(slime) < 75:
 		slime_hp -= 1
 		message = "Hit! Slime HP: %d/3" % slime_hp
