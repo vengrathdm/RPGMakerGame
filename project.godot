@@ -1,18 +1,15 @@
 [application]
-config/name="Ashwood: The Lost Lantern"
+config/name="Tiny RPG Demo"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
-boot_splash/bg_color=Color(0.035, 0.045, 0.06, 1)
-boot_splash/show_image=false
 
 [display]
-window/size/viewport_width=960
-window/size/viewport_height=540
-window/size/window_width_override=960
-window/size/window_height_override=540
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=640
+window/size/window_height_override=360
 window/stretch/mode="canvas_items"
 
 [rendering]
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-textures/canvas_textures/default_texture_filter=0
