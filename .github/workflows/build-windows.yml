@@ -2,7 +2,8 @@ name: Build Windows Game
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -11,10 +12,21 @@ jobs:
     container:
       image: barichello/godot-ci:4.3
     steps:
-      - uses: actions/checkout@v4
-      - name: Export Windows
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Godot project
+        run: godot --headless --path . --editor --quit
+
+      - name: Export Windows executable
         run: godot --headless --path . --export-release "Windows Desktop" "Ashwood.exe"
-      - uses: actions/upload-artifact@v4
+
+      - name: Verify executable
+        run: test -s Ashwood.exe
+
+      - name: Upload Windows game
+        uses: actions/upload-artifact@v4
         with:
           name: Ashwood-Windows
           path: Ashwood.exe
+          if-no-files-found: error
