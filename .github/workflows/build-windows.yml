@@ -2,31 +2,28 @@ name: Build Windows Game
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  export:
+  build:
     runs-on: ubuntu-latest
     container:
       image: barichello/godot-ci:4.3
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Verify Godot project
-        run: godot --headless --path . --editor --quit
+      - name: Check project
+        run: godot --headless --editor --quit
 
-      - name: Export Windows executable
-        run: godot --headless --path . --export-release "Windows Desktop" "Ashwood.exe"
+      - name: Build Windows EXE
+        run: godot --headless --export-release "Windows Desktop" TinyRPG.exe
 
-      - name: Verify executable
-        run: test -s Ashwood.exe
+      - name: Check EXE
+        run: test -s TinyRPG.exe
 
-      - name: Upload Windows game
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: Ashwood-Windows
-          path: Ashwood.exe
-          if-no-files-found: error
+          name: TinyRPG-Windows
+          path: TinyRPG.exe
