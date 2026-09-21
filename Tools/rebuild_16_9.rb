@@ -2,7 +2,7 @@
 require "zlib"
 path="Data/Scripts.rxdata"
 data=Marshal.load(File.binread(path))
-name="RPGMakerGame - 16:9 Core"
+name="RPGMakerGame - 16:9 Gameplay Core"
 src=File.binread("Tools/rgss/rpgmakergame_16_9_core.rb")
 data.delete_if{|e| e.is_a?(Array) && e[0].to_s==name}
 entry=[name,Zlib::Deflate.deflate(src)]
