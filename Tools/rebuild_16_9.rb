@@ -1,35 +1,25 @@
-# Rebuild the RPG Maker XP script database with the native 16:9 core.
+# Rebuild the RPG Maker XP script database with the proven custom-resolution core.
+# 16:9 is implemented at the RGSS level: 1024x576, with the map/tilemap
+# viewport rewritten by the injected core. Main remains the final script.
 require "zlib"
 
 path = "Data/Scripts.rxdata"
 data = Marshal.load(File.binread(path))
-
 name = "RPGMakerGame - 16:9 Gameplay Core"
 source = File.binread("Tools/rgss/rpgmakergame_16_9_core.rb")
 
-# Remove an earlier copy, wherever it is.
-data.delete_if do |entry|
-  entry.is_a?(Array) && entry.length >= 3 && entry[1].to_s == name
-end
+data.delete_if { |e| e.is_a?(Array) && e.length >= 3 && e[1].to_s == name }
 
-main_index = data.rindex do |entry|
-  entry.is_a?(Array) && entry.length >= 3 && entry[1].to_s.strip == "Main"
+main_index = data.rindex do |e|
+  e.is_a?(Array) && e.length >= 3 && e[1].to_s.strip == "Main"
 end
-abort "Could not find RPG Maker XP Main script" unless main_index
+abort "Could not find Main" unless main_index
 
-# Main must remain the final script. Remove anything that was below it.
 data.slice!(main_index + 1, data.length - main_index - 1) if main_index < data.length - 1
 
-# RPG Maker XP uses [id, name, compressed_source].
-ids = data.map do |entry|
-  entry.is_a?(Array) && entry[0].is_a?(Integer) ? entry[0] : 0
-end
+ids = data.map { |e| e.is_a?(Array) && e[0].is_a?(Integer) ? e[0] : 0 }
 next_id = (ids.max || 0) + 1
 
-entry = [next_id, name, Zlib::Deflate.deflate(source)]
-
-# The core must execute before Main, but after the stock engine scripts.
-data.insert(main_index, entry)
-
+data.insert(main_index, [next_id, name, Zlib::Deflate.deflate(source)])
 File.binwrite(path, Marshal.dump(data))
-puts "Injected native 16:9 core as script #{next_id}; Main remains final"
+puts "Injected #{name} before Main"
