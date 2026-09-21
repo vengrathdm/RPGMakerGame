@@ -1,0 +1,20 @@
+name: Build Windows Game
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export Windows
+        run: godot --headless --path . --export-release "Windows Desktop" "Ashwood.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Ashwood-Windows
+          path: Ashwood.exe
